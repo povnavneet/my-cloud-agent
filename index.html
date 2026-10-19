@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Hustler - Navneet Ultimate AI Study Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hustler: {
+                            bg: '#020617',
+                            card: '#080d1a',
+                            border: '#1e293b',
+                            accent: '#6366f1',
+                            glow: '#818cf8',
+                            emerald: '#10b981'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'glow-pulse': 'glowPulse 1.5s infinite alternate'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.35', filter: 'blur(40px)' },
+                            '50%': { opacity: '0.75', filter: 'blur(60px)' }
+                        },
+                        glowPulse: {
+                            '0%': { boxShadow: '0 0 12px rgba(99, 102, 241, 0.4)' },
+                            '100%': { boxShadow: '0 0 30px rgba(129, 140, 248, 0.9)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(8, 13, 26, 0.9); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(13, 20, 38, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(99, 102, 241, 0.22); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-card:hover { border-color: rgba(99, 102, 241, 0.6); transform: translateY(-4px); box-shadow: 0 12px 30px -6px rgba(99, 102, 241, 0.3); }
+        .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #020617; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        
+        .spinner-ring {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(129, 140, 248, 0.2);
+            border-top-color: #818cf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between custom-scrollbar">
+
+    <!-- Ambient Orbs -->
+    <div class="fixed top-0 left-1/4 w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow"></div>
+    <div class="fixed bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow"></div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div id="navAvatar" class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 border border-indigo-400/40">
+                    <img src="assets/solo.png" alt="Solo" class="w-full h-full object-cover rounded-xl" onerror="renderFallbackAvatar('navAvatar')">
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-wider gradient-text">TEAM HUSTLER</span>
+                    <span class="block text-[10px] text-slate-400 font-mono">AI Study Agent v4.5 Ultimate</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openAgentModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium text-sm shadow-lg shadow-indigo-500/30 flex items-center space-x-2 animate-glow-pulse">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Launch Full Workspace</span>
+                </button>
+                <button onclick="toggleSettingsModal()" class="p-2.5 rounded-xl glass-card text-slate-300 hover:text-white">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Landing View -->
+    <main class="max-w-7xl mx-auto px-6 py-10 flex-grow w-full space-y-10">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                <div>
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-mono mb-3">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                        <span id="greetingTime">Active Session</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold" id="navneetGreeting">Welcome, Navneet</h1>
+                    <p class="text-slate-400 mt-2 text-sm max-w-xl">High-performance AI intelligence portal customized for SSC Stenographer, English proficiency, and Civil Services targets.</p>
+                </div>
+                <div class="relative p-3 rounded-2xl glass-panel border border-indigo-500/40 animate-float">
+                    <div id="heroAvatar" class="w-28 h-28 rounded-xl bg-slate-900 border border-indigo-500/30 flex items-center justify-center overflow-hidden">
+                        <img src="assets/solo.png" alt="Solo" class="w-full h-full object-cover" onerror="renderFallbackAvatar('heroAvatar', true)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPECIAL TOOLS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- TOOL 1: SSC Steno Dictation Engine -->
+            <div class="glass-card p-6 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="mic" class="w-5 h-5 text-indigo-400"></i>
+                        <span>Shorthand Audio Dictation Player</span>
+                    </h3>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Steno Tool</span>
+                </div>
+                <p class="text-xs text-slate-400">AI will dictate English passages at official SSC Stenographer exam speeds for outline practice.</p>
+                
+                <textarea id="dictationText" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 custom-scrollbar" placeholder="Paste or type text for dictation practice..."></textarea>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="setSpeed(0.8)" id="speed80" class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700 hover:border-indigo-500">80 WPM</button>
+                        <button onclick="setSpeed(1.0)" id="speed100" class="px-2.5 py-1 rounded bg-indigo-600 text-[11px] font-mono text-white border border-indigo-500 shadow">100 WPM</button>
+                        <button onclick="setSpeed(1.2)" id="speed120" class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700 hover:border-indigo-500">120 WPM</button>
+                    </div>
+                    <button onclick="startDictation()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-lg shadow-indigo-500/25">
+                        <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                        <span>Start Dictation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TOOL 2: Pomodoro Focus Sprint Timer -->
+            <div class="glass-card p-6 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="timer" class="w-5 h-5 text-purple-400"></i>
+                        <span>Study Sprint Pomodoro Timer</span>
+                    </h3>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">Focus Sprint</span>
+                </div>
+                
+                <div class="flex items-center justify-between py-2">
+                    <div>
+                        <div class="text-4xl font-extrabold font-mono gradient-text" id="timerDisplay">25:00</div>
+                        <p class="text-[11px] text-slate-400 mt-1">25 Minutes Intensive Focus Block</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="toggleTimer()" id="timerBtn" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-lg shadow-purple-500/25">Start Sprint</button>
+                        <button onclick="resetTimer()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div id="timerProgress" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-0 transition-all duration-1000"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Career Modules -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-3">
+                    <i data-lucide="edit-3" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">SSC Stenographer Prep</h3>
+                <p class="text-xs text-slate-400 mb-4">Pitman Shorthand rules, dictations & outline practice.</p>
+                <div class="p-2.5 rounded-lg bg-slate-900/60 text-xs font-mono text-indigo-400 border border-slate-800">Target Speed: 100+ wpm</div>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-3">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">English & Maths</h3>
+                <p class="text-xs text-slate-400 mb-4">Grammar rules, vocabulary & basic quantitative formulas.</p>
+                <div class="p-2.5 rounded-lg bg-slate-900/60 text-xs font-mono text-purple-400 border border-slate-800">Grammar & Quant Shortcuts</div>
+            </div>
+            <div class="glass-card p-6 rounded-2xl border-emerald-500/20">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3">
+                    <i data-lucide="target" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Goal: Civil Services</h3>
+                <p class="text-xs text-slate-400 mb-4">GS foundation, current affairs & analytical clarity.</p>
+                <div class="p-2.5 rounded-lg bg-slate-900/60 text-xs font-mono text-emerald-400 border border-slate-800">Long Term Vision</div>
+            </div>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="glass-card p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-3">
+                <div>
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-indigo-400"></i>
+                        <span>AI Response Output Mode</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">Choose how Gemini structures answers for you.</p>
+                </div>
+                <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
+                    <button id="modeNormal" onclick="setResponseMode('normal')" class="px-4 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow">Normal Answer</button>
+                    <button id="modeDetailed" onclick="setResponseMode('detailed')" class="px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 transition-all hover:text-white">Detailed + Diagrams</button>
+                </div>
+            </div>
+            <p id="modeDescription" class="text-xs text-indigo-300/80 bg-indigo-950/40 p-2.5 rounded-xl border border-indigo-800/40">
+                Current Mode: <strong>Normal</strong> — Direct, concise & clean AI responses.
+            </p>
+        </div>
+    </main>
+
+    <!-- FULLSCREEN CHAT WORKSPACE WITH MIC VOICE SEARCH -->
+    <div id="agentModal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex flex-col hidden">
+        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/90 px-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>Team Hustler Fullscreen AI Portal</span>
+                    </h4>
+                    <span class="text-[11px] text-emerald-400 flex items-center gap-1.5 font-mono">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Gemini AI Workspace
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="createNewChatSession()" class="px-3 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs flex items-center gap-1 transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>New Chat</span>
+                </button>
+                <button onclick="clearChatHistory()" class="px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs flex items-center gap-1 transition-all">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Clear All</span>
+                </button>
+                <button onclick="closeAgentModal()" class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-all">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow p-6 overflow-y-auto space-y-4 custom-scrollbar max-w-5xl mx-auto w-full" id="chatContainer">
+            <!-- Messages -->
+        </div>
+
+        <div class="p-4 border-t border-slate-800/80 bg-slate-900/90 px-6">
+            <div class="max-w-5xl mx-auto flex items-center gap-3">
+                <button onclick="startVoiceInput()" id="micBtn" class="p-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-indigo-500 text-slate-300 hover:text-white transition-all flex-shrink-0">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+                <input type="text" id="userInput" placeholder="Ask shorthand rules, English grammar, or concepts..." onkeydown="if(event.key==='Enter') sendAgentMessage()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <button onclick="sendAgentMessage()" id="sendBtn" class="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all flex items-center space-x-2 flex-shrink-0 shadow-lg shadow-indigo-500/25">
+                    <span>Send</span>
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel border-indigo-500/40 w-full max-w-md rounded-2xl shadow-2xl p-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4 text-indigo-400"></i> Settings & API Keys
+                </h3>
+                <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Gemini API Key</label>
+                    <input type="password" id="geminiKey" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500 focus:outline-none font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">OpenRouter API Key (Optional)</label>
+                    <input type="password" id="openRouterKey" placeholder="sk-or-v1-..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500 focus:outline-none font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Select AI Model Engine</label>
+                    <select id="geminiModel" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:border-indigo-500 focus:outline-none">
+                        <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Fast & Stable)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Reasoning)</option>
+                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental)</option>
+                        <option value="openrouter-flash">OpenRouter: Gemini Flash Route</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="saveSettings()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition-all">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-slate-800/80 py-4 text-center text-xs text-slate-400">
+        <p>Coded with 🔥 by Navneet</p>
+    </footer>
+
+    <!-- SCRIPT ENGINE -->
+    <script>
+        lucide.createIcons();
+
+        let currentOutputMode = 'normal';
+        let chatHistory = [];
+        let dictationRate = 1.0;
+        let timerInterval = null;
+        let timerSeconds = 1500;
+        let isTimerRunning = false;
+
+        function renderFallbackAvatar(elementId, isHero = false) {
+            const el = document.getElementById(elementId);
+            if(!el) return;
+            const size = isHero ? "w-12 h-12" : "w-5 h-5";
+            el.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl"><i data-lucide="cpu" class="${size}"></i></div>`;
+            lucide.createIcons();
+        }
+
+        function updateTimeAndGreeting() {
+            const h = new Date().getHours();
+            let g = "Subh Namaste, Navneet!";
+            if(h>=4 && h<12) g = "Subh Namaste Good Morning Navneet!";
+            else if(h>=12 && h<17) g = "Subh Afternoon Navneet!";
+            else if(h>=17 && h<22) g = "Good Evening Navneet!";
+            else g = "Subh Ratri / Night Coding Navneet!";
+            document.getElementById('navneetGreeting').innerHTML = `<span class="gradient-text">${g}</span>`;
+        }
+
+        function setSpeed(rate) {
+            dictationRate = rate;
+            document.getElementById('speed80').className = rate === 0.8 ? "px-2.5 py-1 rounded bg-indigo-600 text-[11px] font-mono text-white border border-indigo-500 shadow" : "px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700";
+            document.getElementById('speed100').className = rate === 1.0 ? "px-2.5 py-1 rounded bg-indigo-600 text-[11px] font-mono text-white border border-indigo-500 shadow" : "px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700";
+            document.getElementById('speed120').className = rate === 1.2 ? "px-2.5 py-1 rounded bg-indigo-600 text-[11px] font-mono text-white border border-indigo-500 shadow" : "px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700";
+        }
+
+        function startDictation() {
+            const text = document.getElementById('dictationText').value.trim();
+            if(!text) { alert('Pehle dictation text box me kuch likh ya paste kar lo!'); return; }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = dictationRate;
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerBtn');
+            if(isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                btn.innerText = "Resume";
+            } else {
+                isTimerRunning = true;
+                btn.innerText = "Pause";
+                timerInterval = setInterval(() => {
+                    if(timerSeconds > 0) {
+                        timerSeconds--;
+                        updateTimerUI();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        alert('Pomodoro Focus Sprint Complete! Take a 5 min break.');
+                        resetTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSeconds = 1500;
+            document.getElementById('timerBtn').innerText = "Start Sprint";
+            updateTimerUI();
+        }
+
+        function updateTimerUI() {
+            const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+            const s = (timerSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+            const pct = ((1500 - timerSeconds) / 1500) * 100;
+            document.getElementById('timerProgress').style.width = `${pct}%`;
+        }
+
+        function startVoiceInput() {
+            if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Browser voice input support nahi karta.');
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.onstart = function() {
+                document.getElementById('micBtn').className = "p-3.5 rounded-xl bg-red-600 border border-red-500 text-white animate-pulse flex-shrink-0";
+            };
+            recognition.onresult = function(e) {
+                document.getElementById('userInput').value = e.results[0][0].transcript;
+                document.getElementById('micBtn').className = "p-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex-shrink-0";
+            };
+            recognition.onerror = function() {
+                document.getElementById('micBtn').className = "p-3.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex-shrink-0";
+            };
+            recognition.start();
+        }
+
+        function setResponseMode(mode) {
+            currentOutputMode = mode;
+            const btnNormal = document.getElementById('modeNormal');
+            const btnDetailed = document.getElementById('modeDetailed');
+            const desc = document.getElementById('modeDescription');
+
+            if (mode === 'normal') {
+                btnNormal.className = "px-4 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow";
+                btnDetailed.className = "px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 transition-all hover:text-white";
+                desc.innerHTML = `Current Mode: <strong>Normal</strong> — Direct, concise & clean AI responses.`;
+            } else {
+                btnDetailed.className = "px-4 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow";
+                btnNormal.className = "px-4 py-1.5 rounded-lg text-xs font-medium text-slate-400 transition-all hover:text-white";
+                desc.innerHTML = `Current Mode: <strong>Detailed + Diagram</strong> — Comprehensive breakdown with structured diagrams.`;
+            }
+        }
+
+        function toggleSettingsModal() { document.getElementById('settingsModal').classList.toggle('hidden'); }
+        function openAgentModal() { 
+            document.getElementById('agentModal').classList.remove('hidden');
+            renderChatHistory();
+        }
+        function closeAgentModal() { document.getElementById('agentModal').classList.add('hidden'); }
+
+        function saveSettings() {
+            const key = document.getElementById('geminiKey').value.trim();
+            const openRouter = document.getElementById('openRouterKey').value.trim();
+            const model = document.getElementById('geminiModel').value;
+            if(key) localStorage.setItem('gemini_key', key);
+            if(openRouter) localStorage.setItem('openrouter_key', openRouter);
+            localStorage.setItem('gemini_model', model);
+            alert('Settings Saved Successfully!');
+            toggleSettingsModal();
+        }
+
+        function loadChatHistory() {
+            const saved = localStorage.getItem('hustler_chat_history');
+            if(saved) {
+                try { chatHistory = JSON.parse(saved); } catch(e) { chatHistory = []; }
+            } else {
+                chatHistory = [{
+                    role: 'assistant',
+                    text: 'Namaste Navneet! Settings me API key save karke full session start kar lo.'
+                }];
+            }
+        }
+
+        function saveHistory() {
+            localStorage.setItem('hustler_chat_history', JSON.stringify(chatHistory));
+        }
+
+        function createNewChatSession() {
+            chatHistory = [{
+                role: 'assistant',
+                text: 'New chat session initialized for Navneet. Ask your study questions!'
+            }];
+            saveHistory();
+            renderChatHistory();
+        }
+
+        function clearChatHistory() {
+            chatHistory = [];
+            saveHistory();
+            renderChatHistory();
+        }
+
+        function renderChatHistory() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+
+            chatHistory.forEach(msg => {
+                const div = document.createElement('div');
+                if(msg.role === 'user') {
+                    div.className = "flex items-start justify-end space-x-3";
+                    div.innerHTML = `<div class="bg-indigo-600 p-4 rounded-2xl rounded-tr-none text-xs md:text-sm text-white max-w-2xl">${msg.text}</div>`;
+                } else {
+                    div.className = "flex items-start space-x-3";
+                    div.innerHTML = `
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 flex-shrink-0">
+                            <i data-lucide="bot" class="w-4 h-4"></i>
+                        </div>
+                        <div class="glass-card p-4 rounded-2xl rounded-tl-none text-xs md:text-sm text-slate-200 max-w-2xl whitespace-pre-wrap">${msg.text}</div>
+                    `;
+                }
+                chatContainer.appendChild(div);
+            });
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            lucide.createIcons();
+        }
+
+        window.onload = function() {
+            updateTimeAndGreeting();
+            if(localStorage.getItem('gemini_key')) document.getElementById('geminiKey').value = localStorage.getItem('gemini_key');
+            if(localStorage.getItem('openrouter_key')) document.getElementById('openRouterKey').value = localStorage.getItem('openrouter_key');
+            if(localStorage.getItem('gemini_model')) document.getElementById('geminiModel').value = localStorage.getItem('gemini_model');
+            loadChatHistory();
+        };
+
+        // MULTI-LLM API REQUEST
+        async function sendAgentMessage() {
+            const input = document.getElementById('userInput');
+            const chatContainer = document.getElementById('chatContainer');
+            const prompt = input.value.trim();
+
+            if(!prompt) return;
+
+            const apiKey = localStorage.getItem('gemini_key');
+            const openRouterKey = localStorage.getItem('openrouter_key');
+            const selectedModel = localStorage.getItem('gemini_model') || 'gemini-1.5-flash';
+
+            if(!apiKey && !openRouterKey) {
+                alert('Pehle Settings (⚙️ icon) me jaakar Gemini API Key ya OpenRouter Key save karo!');
+                toggleSettingsModal();
+                return;
+            }
+
+            chatHistory.push({ role: 'user', text: prompt });
+            saveHistory();
+            renderChatHistory();
+            input.value = '';
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "flex items-start space-x-3";
+            loadingDiv.id = "loadingBubble";
+            loadingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 flex-shrink-0">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div class="glass-card p-4 rounded-2xl rounded-tl-none text-xs text-slate-300 flex items-center space-x-3">
+                    <div class="spinner-ring"></div>
+                    <span>Synthesizing response at high speed...</span>
+                </div>
+            `;
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            lucide.createIcons();
+
+            let systemInstruction = "You are Team Hustler Study Agent assisting Navneet. Answer accurately and directly.";
+            if(currentOutputMode === 'detailed') {
+                systemInstruction += " Provide detailed step-by-step breakdowns, structured bullet points, and ASCII/text diagrams where applicable.";
+            } else {
+                systemInstruction += " Keep your answer concise, direct, and to the point.";
+            }
+
+            let aiText = "";
+
+            if (selectedModel === 'openrouter-flash' && openRouterKey) {
+                try {
+                    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${openRouterKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "model": "google/gemini-flash-1.5",
+                            "messages": [
+                                {"role": "system", "content": systemInstruction},
+                                {"role": "user", "content": prompt}
+                            ]
+                        })
+                    });
+                    const orData = await res.json();
+                    if(orData.choices && orData.choices[0].message.content) {
+                        aiText = orData.choices[0].message.content;
+                    } else {
+                        aiText = "OpenRouter Error: " + JSON.stringify(orData);
+                    }
+                } catch(e) {
+                    aiText = "OpenRouter Connection Failed: " + e.message;
+                }
+            } else {
+                const modelsToTry = [selectedModel, 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp'];
+                
+                for(let m of modelsToTry) {
+                    try {
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [
+                                        { text: systemInstruction },
+                                        { text: prompt }
+                                    ]
+                                }]
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                            aiText = data.candidates[0].content.parts[0].text;
+                            break;
+                        }
+                    } catch(err) {
+                        console.log(`Model ${m} failed, trying next fallback...`);
+                    }
+                }
+            }
+
+            const lb = document.getElementById('loadingBubble');
+            if(lb) lb.remove();
+
+            if(!aiText) {
+                aiText = "API Key Error: Google Gemini API se response nahi mila. Please verify your API Key in Settings.";
+            }
+
+            chatHistory.push({ role: 'assistant', text: aiText });
+            saveHistory();
+            renderChatHistory();
+        }
+    </script>
+</body>
+</html>
